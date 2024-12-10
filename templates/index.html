@@ -1,1 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Prediction</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 24px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #007BFF;
+            outline: none;
+        }
+
+        .suggestion-box {
+            font-size: 18px;
+            color: #555;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-align: center;
+            min-height: 30px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: #007BFF;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+    <script>
+        async function getNextWord() {
+            const text = document.getElementById('input-text').value;
+            const spinner = document.getElementById('spinner');
+            const nextWord = document.getElementById('next-word');
+            
+            // Show spinner
+            spinner.classList.remove('hidden');
+            nextWord.innerText = '';
+
+            // Call the API to get the next word prediction
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ text })
+            });
+
+            const result = await response.json();
+
+            // Hide spinner
+            spinner.classList.add('hidden');
+            nextWord.innerText = result.next_word || 'No suggestion';
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Word Prediction</h1>
+        <input type="text" id="input-text" onkeyup="getNextWord()" placeholder="Type a sentence...">
+        <p>Next word suggestion:</p>
+        <div class="suggestion-box">
+            <span id="next-word">...</span>
+            <span id="spinner" class="spinner hidden"></span>
+        </div>
+    </div>
+</body>
+
+</html>
